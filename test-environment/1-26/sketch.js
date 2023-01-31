@@ -5,8 +5,9 @@ function setup() {
 
   characters = [
     new Character(100, 100, 50),
-    new Character(300, 300, 80)
-  ]
+    new Character(300, 300, 80),
+    new Character(100,300,100)
+  ];
 }
 
 // making the character
@@ -77,14 +78,9 @@ class Character {
   // check if mouse cursor is in character
   contains(x, y) {
     // check between l & r of point, defines a boolean
-    let insideX = mouseX >= x && mouseX <= x + this.size;
-    let insideY = mouseY >= y && mouseY <= y + this.size;
-    if (insideX && insideY == true) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    let insideX = this.x >= x && this.x <= x + this.size;
+    let insideY = this.y >= y && this.y <= y + this.size;
+    return insideX && insideY;
 
     // square version inside
     //let inside = insideX && insideY;
@@ -109,7 +105,9 @@ class Character {
 
   // reset state after mouse is released
   mouseReleased() {
-    this.dragging = false;
+    if (this.dragging) {
+      this.dragging = false;
+    }
   }
 
   // moving character using mouse
