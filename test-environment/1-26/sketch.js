@@ -78,8 +78,8 @@ class Character {
   // check if mouse cursor is in character
   contains(x, y) {
     // check between l & r of point, defines a boolean
-    let insideX = this.x >= x && this.x <= x + this.size;
-    let insideY = this.y >= y && this.y <= y + this.size;
+    let insideX = x >= this.x && x <= this.x + this.size;
+    let insideY = y >= this.y && y <= this.y + this.size;
     return insideX && insideY;
 
     // square version inside
