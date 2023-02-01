@@ -1,10 +1,14 @@
 let globalColor;
 let paletteBoxes;
-let paintObjects;
 
 function setup() {
-  createCanvas(1280, 720);
+  // creating canvas to window size (minus 1 for no scroll bars)
+  createCanvas(windowWidth - 1, windowHeight - 1);
+  
+  // setting default color
   globalColor = color('black');
+  
+  // creating the palette
   paletteBoxes = [
     new paletteBox(0, color('red')),
     new paletteBox(50, color('orange')),
@@ -17,112 +21,59 @@ function setup() {
     new paletteBox(400, color('white')),
     new paletteBox(450, color('black'))
   ];
-  paintObjects = [];
+
+  // drawing the background
+  background(255);
 }
 
 function draw() {
-  background(255);
+  // loop to draw the palette
   for (let i = 0; i < paletteBoxes.length; i++) {
     paletteBoxes[i].draw();
   }
-  for (let i = 0; i < paintObjects.length; i++) {
-    paintObjects[i].draw();
+
+  // drawing lines when mouse is pressed
+  if (mouseIsPressed) {
+    stroke(globalColor);
+    strokeWeight(20);
+    line(mouseX, mouseY, pmouseX, pmouseY);
   }
 }
 
 function mousePressed() {
+  // loop to check for clicks on the palette
   for (let i = 0; i < paletteBoxes.length; i++) {
     paletteBoxes[i].mousePressed();
-  }
-  if (paintObjects.length == 0) {
-    paintObjects.push(new paintObject(mouseX, mouseY));
-  }
-  for (let i = 0; i < paintObjects.length; i++) {
-    paintObjects[i].mousePressed();
-  }
-  //console.log("globalColor:", globalColor.toString());
-}
-
-function mouseReleased() {
-  for (let i = 0; i < paintObjects.length; i++) {
-    paintObjects[i].mouseReleased();
-  }
-}
-
-function mouseDragged() {
-  for (let i = 0; i < paintObjects.length; i++) {
-    paintObjects[i].mouseDragged();
   }
 }
 
 class paletteBox {
+  // setting the height & color of the palette box
   constructor(y, color) {
     this.y = y;
     this.color = color;
   }
 
+  // drawing an individual palette box
   draw() {
     push();
     noStroke();
     fill(this.color);
     square(0, this.y, 50);
     pop();
-    //console.log("boxColor:", this.color.toString());
   }
 
+  // checking if the mouse is inside a palette box
   contains(x, y) {
     let insideX = x >= 0 && x <= 50;
     let insideY = y >= this.y && y <= this.y + 50;
     return insideX && insideY;
   }
 
+  // changing color if mouse is inside a palette box
   mousePressed() {
     if (this.contains(mouseX, mouseY)) {
       globalColor = this.color;
-    }
-  }
-}
-
-class paintObject {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-
-    this.dragging = false;
-    this.dragStartX = -1;
-    this.dragStartY = -1;
-    this.characterStartX = -1;
-    this.characterStartY = -1;
-  }
-
-  draw() {
-    noStroke();
-    fill(globalColor);
-    circle(this.x, this.y, 20);
-  }
-
-  mousePressed() {
-    let inside = dist(mouseX, mouseY, this.x, this.y) <= 10;
-    if (inside) {
-      this.dragging = true;
-      this.dragStartX = mouseX;
-      this.dragStartY = mouseY;
-      this.characterStartX = this.x;
-      this.characterStartY = this.y;
-    }
-  }
-
-  mouseDragged() {
-    if (this.dragging) {
-      this.x = this.characterStartX + (mouseX - this.dragStartX);
-      this.y = this.characterStartY + (mouseY - this.dragStartY);
-      paintObjects.push(new paintObject(this.x, this.y));
-    }
-  }
-
-  mouseReleased() {
-    if (this.dragging) {
-      this.dragging = false;
     }
   }
 }
