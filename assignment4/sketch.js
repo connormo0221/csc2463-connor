@@ -1,5 +1,4 @@
 let bugSprite;
-let numberOfBugs = 15;
 let numberOfSquish = 0;
 
 let bugs = [];
@@ -10,7 +9,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(1000, 1000);
   imageMode(CENTER);
   angleMode(DEGREES);
 
@@ -18,8 +17,8 @@ function setup() {
   frameRate(60);
   
   // initializing the bugs
-  for(let i = 0; i < numberOfBugs; i++) {
-    bugs[i] = new Bug(random(40, 760), random(40, 760), random(1, 3), random([0, 1]));
+  for(let i = 0; i < random(15, 25); i++) {
+    bugs[i] = new Bug(random(40, width - 40), random(40, width - 40), random(1, 3), random([0, 1]));
   }
 }
 
@@ -34,7 +33,7 @@ function mousePressed() {
   for (let i = 0; i < bugs.length; i++) {
     if (bugs[i].contains(mouseX, mouseY)) {
       if (bugs[i].moving != 0) {
-        bugs[i].stop();
+        bugs[i].stop(1);
       }
     }
   }
@@ -122,13 +121,15 @@ class Bug {
     this.xDirection = -1;
   }
 
-  stop() {
+  stop(squish) {
     // set bug to stop moving
     this.moving = 0;
-    numberOfSquish++;
-
-    // debug: print out # of squishes to console
-    print("Squish Count: " + numberOfSquish);
+    
+    if (squish == 1) {
+      numberOfSquish++;
+      // debug: print out # of squishes to console
+      print("Squish Count: " + numberOfSquish);
+    }
   }
 
   contains(x, y) {
