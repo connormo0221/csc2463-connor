@@ -6,7 +6,7 @@ let bugs = [];
 
 function preload() {
   // loading bug sprite image
-  bugSprite = loadImage("assets/bugsprite.png");
+  bugSprite = loadImage("assets/BugSprite2xUpscale.png");
 }
 
 function setup() {
@@ -19,7 +19,7 @@ function setup() {
   
   // initializing the bugs
   for(let i = 0; i < numberOfBugs; i++) {
-    bugs[i] = new Bug(random(100, 700), random(100, 700), random(0.5, 2));
+    bugs[i] = new Bug(random(40, 760), random(40, 760), random(1, 3), random([0, 1]));
   }
 }
 
@@ -41,18 +41,24 @@ function mousePressed() {
 }
 
 class Bug {
-  constructor(dx, dy, speed) {
+  constructor(dx, dy, speed, vert) {
     this.dx = dx;
     this.dy = dy;
     this.speed = speed;
+    this.vert = vert;
 
     this.spriteSheet = bugSprite;
     this.spriteNum = 0;
     this.currentFrame = 0;
     this.moving = 1;
     this.xDirection = 1;
-    this.degDirection = 90;
     this.hasBeenSquished = false;
+
+    if (vert == 0) {
+      this.degDirection = 90;
+    } else {
+      this.degDirection = 180;
+    }
   }
 
   draw() {
@@ -73,7 +79,7 @@ class Bug {
     translate(this.dx, this.dy);
     rotate(this.degDirection);
     scale(this.xDirection, 1);
-    image(this.spriteSheet, 0, 0, 40, 40, this.spriteNum * 40, 0, 40, 40);
+    image(this.spriteSheet, 0, 0, 80, 80, this.spriteNum * 80, 0, 80, 80);
     pop();
     
     // incrementing animation frame based on # of current frame
@@ -81,15 +87,25 @@ class Bug {
       this.currentFrame++;
     }
 
-    // modifying dx based on amount of movement for translate() & speed multiplier
-    this.dx += this.moving * this.speed;
+    // updating dx or dy based on amount of movement & speed multiplier
+    if (this.vert == 0) {
+      this.dx += this.moving * this.speed;
+    } else if (this.vert == 1) {
+      this.dy += this.moving * this.speed;
+    }
 
     // set bugs to move in the opposite direction upon hitting a wall
-    if (this.dx < 20) {
+    if (this.dx < 40) {
       this.degDirection = 90;
       this.moveRight();
-    } else if (this.dx > width - 20) {
+    } else if (this.dx > width - 40) {
       this.degDirection = 270;
+      this.moveLeft();
+    } else if (this.dy < 40) {
+      this.degDirection = 180;
+      this.moveRight();
+    } else if (this.dy > height - 40) {
+      this.degDirection = 0;
       this.moveLeft();
     }
   }
@@ -117,8 +133,8 @@ class Bug {
 
   contains(x, y) {
     // check if bug is inside x & y coordinates
-    let insideX = x >= this.dx - 20 && x <= this.dx + 20;
-    let insideY = y >= this.dy - 20 && y <= this.dy + 20;
+    let insideX = x >= this.dx - 40 && x <= this.dx + 40;
+    let insideY = y >= this.dy - 40 && y <= this.dy + 40;
     return insideX && insideY;
   }
 }
