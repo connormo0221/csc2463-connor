@@ -18,7 +18,7 @@ function setup() {
   
   // initializing the bugs
   for(let i = 0; i < random(15, 25); i++) {
-    bugs[i] = new Bug(random(40, width - 40), random(40, width - 40), random(1, 3), random([0, 1]));
+    bugs[i] = new Bug(random(40, height - 40), random(40, width - 40), random(1, 3), random([0, 1]));
   }
 }
 
