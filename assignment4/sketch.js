@@ -1,7 +1,20 @@
 let bugSprite;
-let numberOfSquish = 0;
-
 let bugs = [];
+
+const GameState = {
+  Start: "Start",
+  Playing: "Playing",
+  GameOver: "GameOver"
+};
+
+let game = {
+  score: 0, 
+  highScore: 0, 
+  maxTime: 30, 
+  elapsedTime: 0, 
+  speed: 0.5,
+  state: GameState.Start
+};
 
 function preload() {
   // loading bug sprite image
@@ -16,34 +29,104 @@ function setup() {
   // manually setting framerate to prevent issues
   frameRate(60);
   
-  // initializing the bugs
-  for(let i = 0; i < random(15, 25); i++) {
-    bugs[i] = new Bug(random(40, height - 40), random(40, width - 40), random(1, 3), random([0, 1]));
+  // initialize first round
+  reset();
+}
+
+function reset() {
+  // reset game state without affecting highScore or maxTime
+  game.elapsedTime = 0;
+  game.score = 0;
+  game.speed = 0.5;
+
+  animations = [];
+  for(let i = 0; i < 30; i++) {
+    bugs[i] = new Bug(random(40, height - 40), random(40, width - 40), random([0, 1]));
   }
 }
 
 function draw() {
-  background(220);
-  for(let i = 0; i < bugs.length; i++) {
-    bugs[i].draw();
+  switch(game.state) {
+    case GameState.Start:
+      background(0);
+      fill(255);
+      textAlign(CENTER);
+
+      // draw Game Start text
+      textSize(50);
+      text("Bug Squish", width / 2, height / 2);
+      textSize(30);
+      text("Press any key to start!", width / 2, (height / 2) + 100);
+      
+      break;
+    case GameState.Playing:
+      let currentTime = game.maxTime - game.elapsedTime;  
+      background(220);
+      
+      // drawing the bugs
+      for(let i = 0; i < bugs.length; i++) {
+        bugs[i].draw();
+      }
+
+      // drawing current score
+      fill(0);
+      textSize(40);
+      text("Score: " + ('00' + game.score).slice(-2), 90, 40);
+      
+      // drawing current time
+      text("Time Left: " + ('00' + ceil(currentTime)).slice(-2), width - 120, 40);
+      game.elapsedTime += deltaTime / 1000;
+      
+      // if time hits 0, set Game Over state
+      if (currentTime < 0) {
+        game.state = GameState.GameOver;
+      }
+      break
+    case GameState.GameOver:
+      game.highScore = max(game.score, game.highScore);
+      background(0);
+      fill(255);
+      textAlign(CENTER);
+
+      // draw Game Over text
+      textSize(40);
+      text("Game Over!", width / 2, height / 2);
+      textSize(35);
+      text("Score: " + ('00' + game.score).slice(-2), width / 2, (height / 2) + 70);
+      text("High Score: " + ('00' + game.highScore).slice(-2), width / 2, (height / 2) + 120);
+      
+      break;
+  }
+}
+
+function keyPressed() {
+  switch(game.state) {
+    case GameState.Start:
+      game.state = GameState.Playing;
+      break;
+    case GameState.GameOver:
+      reset();
+      game.state = GameState.Playing;
+      break;
   }
 }
 
 function mousePressed() {
-  for (let i = 0; i < bugs.length; i++) {
-    if (bugs[i].contains(mouseX, mouseY)) {
-      if (bugs[i].moving != 0) {
-        bugs[i].stop(1);
+  if (game.state == GameState.Playing) {
+    for (let i = 0; i < bugs.length; i++) {
+      if (bugs[i].contains(mouseX, mouseY)) {
+        if (bugs[i].moving != 0) {
+          bugs[i].stop();
+        }
       }
     }
   }
 }
 
 class Bug {
-  constructor(dx, dy, speed, vert) {
+  constructor(dx, dy, vert) {
     this.dx = dx;
     this.dy = dy;
-    this.speed = speed;
     this.vert = vert;
 
     this.spriteSheet = bugSprite;
@@ -88,9 +171,9 @@ class Bug {
 
     // updating dx or dy based on amount of movement & speed multiplier
     if (this.vert == 0) {
-      this.dx += this.moving * this.speed;
+      this.dx += this.moving * game.speed;
     } else if (this.vert == 1) {
-      this.dy += this.moving * this.speed;
+      this.dy += this.moving * game.speed;
     }
 
     // set bugs to move in the opposite direction upon hitting a wall
@@ -121,15 +204,11 @@ class Bug {
     this.xDirection = -1;
   }
 
-  stop(squish) {
+  stop() {
     // set bug to stop moving
     this.moving = 0;
-    
-    if (squish == 1) {
-      numberOfSquish++;
-      // debug: print out # of squishes to console
-      print("Squish Count: " + numberOfSquish);
-    }
+    ++game.score;
+    game.speed += 0.2;
   }
 
   contains(x, y) {
