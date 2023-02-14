@@ -22,7 +22,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1000, 1000);
+  createCanvas(windowWidth - 1, windowHeight - 1);
   imageMode(CENTER);
   angleMode(DEGREES);
 
@@ -41,7 +41,7 @@ function reset() {
 
   animations = [];
   for(let i = 0; i < 30; i++) {
-    bugs[i] = new Bug(random(40, height - 40), random(40, width - 40), random([0, 1]));
+    bugs[i] = new Bug(random(40, width - 40), random(40, height - 40), random([0, 1]));
   }
 }
 
@@ -54,9 +54,9 @@ function draw() {
 
       // draw Game Start text
       textSize(50);
-      text("Bug Squish", width / 2, height / 2);
+      text("Bug Squish", width / 2, (height / 2) - 30);
       textSize(30);
-      text("Press any key to start!", width / 2, (height / 2) + 100);
+      text("Press any key to start!", width / 2, (height / 2) + 30);
       
       break;
     case GameState.Playing:
@@ -68,13 +68,11 @@ function draw() {
         bugs[i].draw();
       }
 
-      // drawing current score
+      // drawing current score & time
       fill(0);
-      textSize(40);
-      text("Score: " + ('00' + game.score).slice(-2), 90, 40);
-      
-      // drawing current time
-      text("Time Left: " + ('00' + ceil(currentTime)).slice(-2), width - 120, 40);
+      textSize(30);
+      text("Score: " + ('00' + game.score).slice(-2), 70, 30);
+      text("Time Left: " + ('00' + ceil(currentTime)).slice(-2), width - 90, 30);
       game.elapsedTime += deltaTime / 1000;
       
       // if time hits 0, set Game Over state
@@ -90,11 +88,13 @@ function draw() {
 
       // draw Game Over text
       textSize(40);
-      text("Game Over!", width / 2, height / 2);
+      text("Time's Up!", width / 2, (height / 2) - 30);
       textSize(35);
-      text("Score: " + ('00' + game.score).slice(-2), width / 2, (height / 2) + 70);
-      text("High Score: " + ('00' + game.highScore).slice(-2), width / 2, (height / 2) + 120);
-      
+      text("Your Score: " + ('00' + game.score).slice(-2), width / 2, (height / 2) + 40);
+      text("Your High Score: " + ('00' + game.highScore).slice(-2), width / 2, (height / 2) + 90);
+      textSize(25);
+      text("Press any key to restart!", width / 2, (height / 2) + 150);
+
       break;
   }
 }
@@ -108,6 +108,10 @@ function keyPressed() {
       reset();
       game.state = GameState.Playing;
       break;
+  }
+  // debug - skip to game over
+  if (game.state != GameState.GameOver && keyCode == ESCAPE) {
+    game.state = GameState.GameOver;
   }
 }
 
