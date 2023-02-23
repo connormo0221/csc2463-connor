@@ -1,13 +1,14 @@
 // loading the sounds into Tone.js
 let sounds = new Tone.Players({
-  "sound1" : "sounds/sound1.wav",
-  "sound2" : "sounds/sound2.wav",
-  "sound3" : "sounds/sound3.wav",
-  "sound4" : "sounds/sound4.wav"
+  "Windows 95 Startup" : "sounds/Win95-Startup.wav",
+  "Windows 98 Startup" : "sounds/Win98-Startup.wav",
+  "Windows ME Startup" : "sounds/WinME-Startup.wav",
+  "Windows XP Startup" : "sounds/WinXP-Startup.wav",
+  "Windows Vista Startup" : "sounds/WinVS-Startup.wav"
 });
 
 // making arrays for the names of the sounds & buttons
-let soundNames = ["sound1", "sound2", "sound3", "sound4"];
+let soundNames = ["Windows 95 Startup", "Windows 98 Startup", "Windows ME Startup", "Windows XP Startup", "Windows Vista Startup"];
 let buttons = [];
 
 // creating a pitch modifier
@@ -25,9 +26,10 @@ function setup() {
   // adding the sound names to the buttons & playing them upon a mouse press
   soundNames.forEach((word, index) => {
     buttons[index] = createButton(word);
-    buttons[index].size(100);
-    buttons[index].position(350, 200 + (index * 50));
-    buttons[index].mousePressed( () => buttonSound(word));
+    buttons[index].size(250);
+    buttons[index].style('font-size', '20px');
+    buttons[index].position(280, 170 + (index * 50));
+    buttons[index].mousePressed( () => playSound(word));
   });
 
   // creating a slider to control the pitch of the sounds in increments of 1 semi-tone
@@ -53,4 +55,8 @@ function draw() {
   text('10', 550, 490);
   text('Tip: The intervals are measured in semi-tones.', 400, 550);
   pop();
+}
+
+function playSound(soundName) {
+  sounds.player(soundName).start();
 }
